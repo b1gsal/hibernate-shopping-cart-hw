@@ -7,14 +7,16 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.MapsId;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 import java.util.List;
 
 @Entity
+@Table(name = "shopping_carts")
 public class ShoppingCart {
     @Id
     private Long id;
     @OneToMany
-    @JoinColumn(name = "tickets")
+    @JoinColumn(name = "ticket")
     private List<Ticket> ticket;
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
