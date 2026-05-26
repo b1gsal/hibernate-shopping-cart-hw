@@ -23,7 +23,7 @@ public class ShoppingCartDaoImpl implements ShoppingCartDao {
         try {
             session = sessionFactory.openSession();
             transaction = session.beginTransaction();
-            session.merge(shoppingCart);
+            session.save(shoppingCart);
             transaction.commit();
         } catch (Exception e) {
             if (transaction != null) {
@@ -44,7 +44,10 @@ public class ShoppingCartDaoImpl implements ShoppingCartDao {
         try (Session session = sessionFactory.openSession()) {
             Query<ShoppingCart> query = session.createQuery("from ShoppingCart sc "
                     + "left join fetch sc.user "
-                    + "left join fetch sc.ticket "
+                    + "left join fetch sc.ticket t "
+                    + "left join fetch t.movieSession ms "
+                    + "left join fetch ms.movie "
+                    + "left join fetch ms.cinemaHall "
                     + "where sc.user.id = :id", ShoppingCart.class);
             query.setParameter("id", user.getId());
             return query.uniqueResultOptional();
@@ -64,7 +67,14 @@ public class ShoppingCartDaoImpl implements ShoppingCartDao {
             session.merge(shoppingCart);
             transaction.commit();
         } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
             throw new DataProcessingException("Can't merge shopping cart " + shoppingCart, e);
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
     }
 }
