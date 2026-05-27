@@ -1,8 +1,5 @@
 package mate.academy.service.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import mate.academy.dao.ShoppingCartDao;
 import mate.academy.dao.TicketDao;
 import mate.academy.exception.DataProcessingException;
@@ -25,20 +22,11 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public void addSession(MovieSession movieSession, User user) {
-        Ticket ticket = new Ticket();
-        ticket.setUser(user);
-        ticket.setMovieSession(movieSession);
+        Ticket ticket = new Ticket(movieSession, user);
         ticketDao.add(ticket);
-
-        Optional<ShoppingCart> cartFromDb = shoppingCartDao.getByUser(user);
-        if (cartFromDb.isEmpty()) {
-            throw new DataProcessingException("Can't find shopping cart by user " + user);
-        }
-        ShoppingCart shoppingCart = cartFromDb.get();
-        List<Ticket> tickets = shoppingCart.getTicket();
-        tickets.add(ticket);
-        shoppingCart.setTicket(tickets);
-        shoppingCartDao.update(shoppingCart);
+        ShoppingCart userShCart = getByUser(user);
+        userShCart.getTickets().add(ticket);
+        shoppingCartDao.update(userShCart);
     }
 
     @Override
@@ -56,7 +44,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public void clear(ShoppingCart shoppingCart) {
-        shoppingCart.setTicket(new ArrayList<>());
+        shoppingCart.getTickets().clear();
         shoppingCartDao.update(shoppingCart);
     }
 }

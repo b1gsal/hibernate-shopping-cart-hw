@@ -44,7 +44,7 @@ public class ShoppingCartDaoImpl implements ShoppingCartDao {
         try (Session session = sessionFactory.openSession()) {
             Query<ShoppingCart> query = session.createQuery("from ShoppingCart sc "
                     + "left join fetch sc.user "
-                    + "left join fetch sc.ticket t "
+                    + "left join fetch sc.tickets t "
                     + "left join fetch t.movieSession ms "
                     + "left join fetch ms.movie "
                     + "left join fetch ms.cinemaHall "
